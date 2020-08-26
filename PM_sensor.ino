@@ -58,7 +58,7 @@ BLECharCharacteristic Hum_Characteristic("1e553f5d-e229-4d47-ac2d-59871700c944",
 #define VISUALIZATION_CONFIGS 3
 
 // Configs
-#define SERIAL_DEBUG
+// #define SERIAL_DEBUG
 
 // DHT22 Temp/Hum sensor config
 #define DHTPIN 3
@@ -217,12 +217,12 @@ void timerIsr() {
 // Read the buttons.
 int read_LCD_buttons() {
   int adc_key_in = analogRead(0);
-  if (adc_key_in > 1000) return btnNONE;
+  if (adc_key_in >= 1020) return btnNONE;
   if (adc_key_in < 50)   return btnRIGHT;
-  if (adc_key_in < 195)  return btnUP;
-  if (adc_key_in < 400)  return btnDOWN;
+  if (adc_key_in < 250)  return btnUP;
+  if (adc_key_in < 500)  return btnDOWN;
   if (adc_key_in < 700)  return btnLEFT;
-  if (adc_key_in < 990)  return btnSELECT;
+  if (adc_key_in < 1020)  return btnSELECT;
   return btnNONE;  // when all others fail, return this...
 }
 
