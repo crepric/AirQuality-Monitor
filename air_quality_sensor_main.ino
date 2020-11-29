@@ -46,7 +46,8 @@ void setup() {
   // Start timer reading button presses
   CurieTimerOne.start(BTN_CHECK_INTERVAL_MS, &timerIsr);
 
-  // Setup the Bluetooth metrics.
+  // Setup the Bluetooth metrics. Done last so the config values
+  // can be properly sent.
   setupBLE();
 }
 
@@ -58,33 +59,33 @@ void timerIsr() {
   if (lcd_key == btnNONE) {
     return;
   }
-  if (config_data.lcd_bl_mode == LCD_BL_5S) {
+  if (config_data_.lcd_bl_mode == LCD_BL_5S) {
     digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
     // This will only matter if mode is 5s;
-    state.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
+    state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
   }
   switch (lcd_key) {
     case btnDOWN:
-      first_line_offset = mod(first_line_offset + 1,
-                              visualization_line_counts[config_data.visualization]);
+      first_line_offset_ = mod(first_line_offset_ + 1,
+                              visualization_line_counts_[config_data_.visualization]);
       break;
     case btnUP:
-      first_line_offset = mod( first_line_offset - 1,
-                               visualization_line_counts[config_data.visualization]);
+      first_line_offset_ = mod( first_line_offset_ - 1,
+                               visualization_line_counts_[config_data_.visualization]);
       break;
     case btnRIGHT:
-      config_data.visualization = (Views) mod(config_data.visualization + 1,
+      config_data_.visualization = (Views) mod(config_data_.visualization + 1,
                           VISUALIZATION_COUNT);
-      first_line_offset = 0;
+      first_line_offset_ = 0;
       break;
     case btnLEFT:
-      config_data.visualization = (Views) mod(config_data.visualization - 1,
+      config_data_.visualization = (Views) mod(config_data_.visualization - 1,
                           VISUALIZATION_COUNT);
-      first_line_offset = 0;
+      first_line_offset_ = 0;
       break;
     case btnSELECT:
-      if (config_data.visualization == VISUALIZATION_CONFIGS) {
-        state.select_pressed = true;
+      if (config_data_.visualization == VISUALIZATION_CONFIGS) {
+        state_.select_pressed = true;
       }
     case btnNONE:
       break;
@@ -105,25 +106,25 @@ int read_LCD_buttons() {
 
 #ifdef SERIAL_DEBUG
 void printToSerial() {
-  if (state.pm_active) {
+  if (state_.pm_active) {
     Serial.print("PM1.0: ");
-    Serial.print(aq_data.PM1Value);
+    Serial.print(aq_data_.PM1Value);
     Serial.println(" ug/m3");
 
     Serial.print("PM2.5: ");
-    Serial.print(aq_data.PM2_5Value);
+    Serial.print(aq_data_.PM2_5Value);
     Serial.println("  ug/m3");
 
     Serial.print("PM10 : ");
-    Serial.print(aq_data.PM10Value);
+    Serial.print(aq_data_.PM10Value);
     Serial.println("  ug/m3");
   }
   Serial.print("Humidity ");
-  Serial.print(aq_data.hum);
+  Serial.print(aq_data_.hum);
   Serial.println(" %");
 
   Serial.print("Temperature ");
-  Serial.print(aq_data.temp);
+  Serial.print(aq_data_.temp);
   Serial.println(" Deg.");
 
   Serial.println();
@@ -131,19 +132,22 @@ void printToSerial() {
 #endif
 
 void loop() {
+  // Check for a new config.
+  verifyConfigUpdates();
+  
   // Temperature/Humidity readings
-  aq_data.hum = dht.readHumidity();
-  aq_data.temp = dht.readTemperature();
-  publishTempHum(aq_data.temp, aq_data.hum);
+  aq_data_.hum = dht.readHumidity();
+  aq_data_.temp = dht.readTemperature();
+  maybePublishTempHum(aq_data_.temp, aq_data_.hum);
 
   // PM readings
   readPMValues();
 
-  if ((millis() > state.last_visualization + 500 )) {
+  if ((millis() > state_.last_visualization + 500 )) {
     #ifdef SERIAL_DEBUG
       printToSerial();
     #endif
-    state.last_visualization = millis();
+    state_.last_visualization = millis();
     refreshDisplay();
     lcd.setCursor(0, 0);
   }

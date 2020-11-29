@@ -16,7 +16,7 @@
 
 #include "common_defines.h"
 // Remember Changes in the various visualization must also update the line count
-// in the vector visualization_line_counts (defined in common_defines.h).
+// in the vector visualization_line_counts_ (defined in common_defines.h).
 
 // Character bitmap for the simbol of cube (exp 3), with a dot in the bottom to mark
 // that the PM sensor is active.
@@ -54,25 +54,25 @@ void printbar(int value, int max_value, int num_segments) {
 void visualizePmHistogram() {
   lcd.clear();
   int current_line = 0;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM1.0: ");
-    printbar(aq_data.PM1Value, 500, 10);
+    printbar(aq_data_.PM1Value, 500, 10);
   }
   current_line ++;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM2.5: ");
-    printbar(aq_data.PM2_5Value, 500, 10);
+    printbar(aq_data_.PM2_5Value, 500, 10);
   }
   current_line ++;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM10 : ");
-    printbar(aq_data.PM10Value, 500, 10);
+    printbar(aq_data_.PM10Value, 500, 10);
   }
 }
 
@@ -80,45 +80,45 @@ void visualizePmHistogram() {
 void visualizePmData() {
   lcd.clear();
   int current_line = 0;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM1.0: ");
-    lcd.print(aq_data.PM1Value);
-    lcd.setCursor(11, current_line - first_line_offset);
+    lcd.print(aq_data_.PM1Value);
+    lcd.setCursor(11, current_line - first_line_offset_);
     lcd.write(0xea);  // mu
     lcd.print("g/m");
-    if (state.pm_active) {
+    if (state_.pm_active) {
       lcd.write(byte(0)); 
     } else {
       lcd.write(0x1f);
     }
   }
   current_line ++;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM2.5: ");
-    lcd.print(aq_data.PM2_5Value);
-    lcd.setCursor(11, current_line - first_line_offset);
+    lcd.print(aq_data_.PM2_5Value);
+    lcd.setCursor(11, current_line - first_line_offset_);
     lcd.write(0xea);  // mu
     lcd.print("g/m");
-    if (state.pm_active) {
+    if (state_.pm_active) {
       lcd.write(byte(0)); 
     } else {
       lcd.write(0x1f);
     }
   }
   current_line ++;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM10 : ");
-    lcd.print(aq_data.PM10Value);
-    lcd.setCursor(11, current_line - first_line_offset);
+    lcd.print(aq_data_.PM10Value);
+    lcd.setCursor(11, current_line - first_line_offset_);
     lcd.write(0xea);
     lcd.print("g/m");  //mu
-    if (state.pm_active) {
+    if (state_.pm_active) {
       lcd.write(byte(0)); 
     } else {
       lcd.write(0x1f);
@@ -130,30 +130,30 @@ void visualizePmData() {
 void visualizeTempHumData() {
   lcd.clear();
   int current_line = 0;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("Temp: ");
-    lcd.print(aq_data.temp);
+    lcd.print(aq_data_.temp);
     lcd.write(0xb2);
     lcd.print("C");
   }
   current_line ++;
-  if (current_line == first_line_offset ||
-      current_line == first_line_offset + 1) {
-    lcd.setCursor(0, current_line - first_line_offset);
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("Hum:  ");
-    lcd.print(aq_data.hum);
+    lcd.print(aq_data_.hum);
     lcd.print(" %");
   }
 }
 
 void refreshDisplay() {
-  if (config_data.lcd_bl_mode == LCD_BL_5S && state.lcd_off_time > 0 && state.lcd_off_time < millis()) {
+  if (config_data_.lcd_bl_mode == LCD_BL_5S && state_.lcd_off_time > 0 && state_.lcd_off_time < millis()) {
     digitalWrite(LCD_BACKLIGHT_PIN, LOW);
-    state.lcd_off_time = 0;
+    state_.lcd_off_time = 0;
   }
-  switch (config_data.visualization) {
+  switch (config_data_.visualization) {
     case VISUALIZATION_PM_DATA:
       visualizePmData();
       break;
@@ -165,9 +165,9 @@ void refreshDisplay() {
       break;
     case VISUALIZATION_CONFIGS:
       visualizeConfigMenu();
-      if (state.select_pressed) {
+      if (state_.select_pressed) {
         toggleConfigOption();
-        state.select_pressed = false;
+        state_.select_pressed = false;
       }
       break;
     default:

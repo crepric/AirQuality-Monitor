@@ -75,15 +75,15 @@ enum Views {
 
 // Global state variables for visualization
 // Defines the offset for a multi-line visualization in the current window.
-int first_line_offset = 0;
+int first_line_offset_ = 0;
 // Visualization lines for each mode (index matches the constant
 // definition for a specific mode. Number of lines is number of
 // data entries for that mode.
-int visualization_line_counts[] = {
+int visualization_line_counts_[] = {
   /* VISUALIZATION_PM_DATA */3,
   /* VISUALIZATION_PM_HIST */3,
   /* VISUALIZATION_TEMP_HUM */ 2,
-  /* VISUALIZATION_CONFIGS */ 3,
+  /* VISUALIZATION_CONFIGS */ 4,
 };
 
 // ======================
@@ -117,12 +117,20 @@ enum PmSensorModes {
   PM_DC_MODES_COUNT
 };
 
+// ==================
+// Connection modes
+// ==================
+enum BLEDataModes {
+  BLE_SEND_NEVER = 0,
+  BLE_SEND_ALWAYS,
+  BLE_SEND_ON_CHANGE,
+  BLE_DATA_MODES_COUNT
+};
+
 unsigned char pm_serial_buf[PM_PACKET_LEN];
 
 // EEPROM locations for config values
-#define LCD_BL_MODE_ADDRESS 0
-#define FAN_ON_ADDRESS 1
-#define PM_SENSOR_DUTYCICLE_ADDRESS 2
+#define CONFIG_ADDRESS 0
 
 // Definition of mod that accounts for negative numbers
 // e.g.
@@ -143,7 +151,7 @@ struct AqData {
   // Variables for Temp/Hum sensor
   float hum = -1.0;  //Stores humidity value
   float temp = -1.0; //Stores temperature value
-} aq_data;
+} aq_data_, last_sent_aq_data_;
 
 // Configuration bits
 struct ConfigData {
@@ -153,7 +161,8 @@ struct ConfigData {
   bool fan_on = false;
   LcdBlModes lcd_bl_mode = LCD_BL_5S;
   PmSensorModes pm_dc_mode = PM_SENSOR_ALWAYS_ON;
-} config_data;
+  BLEDataModes ble_data_mode = BLE_SEND_ALWAYS;
+} config_data_;
 
 struct State {
   // Tracks last refresh of the display.
@@ -167,6 +176,6 @@ struct State {
   // If we are in config mode, and the select button is pressed,
   // the event is recorded and processed in the next loop.
   bool select_pressed = false;
-} state;
+} state_;
 
 #endif
