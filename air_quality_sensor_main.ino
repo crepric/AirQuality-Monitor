@@ -133,7 +133,7 @@ void printToSerial() {
 
 void loop() {
   // Check for a new config.
-  verifyConfigUpdates();
+  bool config_changed = verifyConfigUpdates();
   
   // Temperature/Humidity readings
   aq_data_.hum = dht.readHumidity();
@@ -143,12 +143,16 @@ void loop() {
   // PM readings
   readPMValues();
 
-  if ((millis() > state_.last_visualization + 500 )) {
+  if ((millis() > state_.next_visualization)) {
     #ifdef SERIAL_DEBUG
       printToSerial();
     #endif
-    state_.last_visualization = millis();
-    refreshDisplay();
+    if (config_changed) {
+      state_.next_visualization = millis() + LCD_CONFIG_DISPLAY_DURATION;
+    } else {
+      state_.next_visualization = millis() + LCD_REFRESH_INTERVAL;
+    }
+    refreshDisplay(config_changed);
     lcd.setCursor(0, 0);
   }
 }

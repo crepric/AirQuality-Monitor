@@ -26,7 +26,7 @@
 #include <SoftwareSerial.h>
 
 // Configs
-#define SERIAL_DEBUG
+// #define SERIAL_DEBUG
 
 // FAN control pin
 #define FAN_CONTROL_PIN 0
@@ -40,6 +40,8 @@
 // ==========================
 #define LCD_BL_TIMEOUT_MS 5000
 #define BTN_CHECK_INTERVAL_MS 200000
+#define LCD_REFRESH_INTERVAL 500
+#define LCD_CONFIG_DISPLAY_DURATION 5000
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 // LCD buttons codes.
 enum Buttons {
@@ -166,7 +168,7 @@ struct ConfigData {
 
 struct State {
   // Tracks last refresh of the display.
-  unsigned long last_visualization = millis();
+  unsigned long next_visualization = millis();
   // If lcd is in 5s mode, this variable records when we want to turn it off.
   unsigned long lcd_off_time = 0;
   // PM sensor duty cycle.

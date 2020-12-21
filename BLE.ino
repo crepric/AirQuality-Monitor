@@ -47,7 +47,7 @@ void setupBLE() {
   blePeripheral.begin();
 }
 
-void verifyConfigUpdates() {
+bool verifyConfigUpdates() {
 //  BLECentral central = blePeripheral.central();
 //  if (central) {
 //    // while the central is still connected to peripheral:
@@ -57,9 +57,11 @@ void verifyConfigUpdates() {
         config_encoded = Config_Characteristic.value();
         setConfigsFromEncodedData(config_encoded);
         saveConfigToEprom();
+        return true;
       }
 //    }
 //  }
+  return false;
 }
 
 void maybePublishTempHum(float temp, float hum) {

@@ -148,10 +148,18 @@ void visualizeTempHumData() {
   }
 }
 
-void refreshDisplay() {
+void refreshDisplay(bool config_changed) {
   if (config_data_.lcd_bl_mode == LCD_BL_5S && state_.lcd_off_time > 0 && state_.lcd_off_time < millis()) {
     digitalWrite(LCD_BACKLIGHT_PIN, LOW);
     state_.lcd_off_time = 0;
+  }
+  if (config_changed) {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("New Config:");
+    lcd.setCursor(0,1);
+    lcd.print(encodeConfigData(config_data_));
+    return;
   }
   switch (config_data_.visualization) {
     case VISUALIZATION_PM_DATA:
