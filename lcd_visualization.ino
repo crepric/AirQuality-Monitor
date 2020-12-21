@@ -181,4 +181,10 @@ void refreshDisplay(bool config_changed) {
     default:
       break;
   }
+  if (config_data_.auto_scroll && 
+      visualization_line_counts_[config_data_.visualization] > 2 &&
+      config_data_.visualization != VISUALIZATION_CONFIGS) {
+        first_line_offset_ = mod(first_line_offset_ + 1,
+                              visualization_line_counts_[config_data_.visualization]);
+  }
 }

@@ -17,19 +17,21 @@
 #include "common_defines.h"
 
 // Encodes the current config in a 4-byte bitset to be sent over BLE or stored in EEPROM
-//  ---------------------------------------------------------------------------------------------
-// | Byte 4  | Byte 3  |                    byte  2       |               byte 1                 |
-//  ---------------------------------------------------------------------------------------------
-// |  8 - 0  | 8 - 0   |   7 - 5 | 4 - 3    |     2 - 0   |    7 - 5    |     4  |    3 - 0      |
-//  ---------------------------------------------------------------------------------------------
-// | UNUSED  | UNUSED  | UNUSED  | BLE_MODE | PM_DC_MODE  | LCD_BL_MODE | FAN_ON | VISUALIZATION |
-//  ---------------------------------------------------------------------------------------------
+//  -----------------------------------------------------------------------------------------------------
+// | Byte 4  | Byte 3  |                    byte  2               |               byte 1                 |
+//  -----------------------------------------------------------------------------------------------------
+// |  8 - 0  | 8 - 0   |   7 - 6 |   5   | 4 - 3    |     2 - 0   |    7 - 5    |     4  |    3 - 0      |
+//  -----------------------------------------------------------------------------------------------------
+// | UNUSED  | UNUSED  | UNUSED  | AU_SC | BLE_MODE | PM_DC_MODE  | LCD_BL_MODE | FAN_ON | VISUALIZATION |
+//  -----------------------------------------------------------------------------------------------------
 unsigned long encodeConfigData(struct ConfigData config_data) {
   char byte_1 = (config_data.visualization & 0xF) |
                 (config_data.fan_on << 4) |
                 ((config_data.lcd_bl_mode & 0x7) << 5);
   char byte_2 = (config_data.pm_dc_mode & 0x7) |
-                (config_data.ble_data_mode & 0x3) << 3;
+                (config_data.ble_data_mode & 0x3) << 3 |
+                (config_data.auto_scroll << 5);
+                
   char byte_3 = 0;
   char byte_4 = 0;
   return byte_1 | byte_2 << 8 | byte_3 << 16 | byte_4 << 24;
@@ -39,11 +41,14 @@ struct ConfigData decodeConfigData(unsigned long encoded_config_data) {
   char byte_1 = encoded_config_data & 0xFF;
   char byte_2 = (encoded_config_data >> 8) & 0xFF;
   struct ConfigData res;
+  // Byte 1.
   res.visualization = (Views) (byte_1 & 0xF);
   res.fan_on = (byte_1 >> 4) & 0x1;
   res.lcd_bl_mode = (LcdBlModes) ((byte_1 >> 5) & 0x7);
+  // Byte 2.
   res.pm_dc_mode = (PmSensorModes) (byte_2 & 0x7);
   res.ble_data_mode = (BLEDataModes) ((byte_2 >> 3) & 0x3);
+  res.auto_scroll = (byte_2 >> 5) & 0x1;
   return res;
 }
 
@@ -57,9 +62,9 @@ void visualizeConfigMenu() {
     lcd.print("LCD BL: ");
     lcd.setCursor(12, current_line - first_line_offset_);
     if (config_data_.lcd_bl_mode == LCD_BL_ON) {
-      lcd.print("ON");
+      lcd.print(" ON");
     } else if (config_data_.lcd_bl_mode == LCD_BL_5S) {
-      lcd.print("5s");
+      lcd.print(" 5s");
     } else {
       lcd.print("OFF");
     }
@@ -79,7 +84,7 @@ void visualizeConfigMenu() {
     lcd.print("PM d.c.: ");
     lcd.setCursor(12, current_line - first_line_offset_);
     if (config_data_.pm_dc_mode == PM_SENSOR_ALWAYS_ON) {
-      lcd.print("ON");
+      lcd.print(" ON");
     } else if (config_data_.pm_dc_mode == PM_SENSOR_15M) {
       lcd.print("15m");
     } else {
@@ -95,9 +100,21 @@ void visualizeConfigMenu() {
     if (config_data_.ble_data_mode == BLE_SEND_NEVER) {
       lcd.print("OFF");
     } else if (config_data_.ble_data_mode == BLE_SEND_ALWAYS) {
-      lcd.print("ON");
+      lcd.print(" ON");
     } else if (config_data_.ble_data_mode == BLE_SEND_ON_CHANGE) {
       lcd.print("CHG");
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("Auto Scr.: ");
+    lcd.setCursor(12, current_line - first_line_offset_);
+    if (config_data_.auto_scroll) {
+      lcd.print(" ON");
+    } else {
+      lcd.print("OFF");
     }
   }
   current_line ++;
@@ -186,6 +203,11 @@ void toggleConfigOption() {
   if (current_line == first_line_offset_) {
     config_data_.ble_data_mode = (BLEDataModes) mod((config_data_.ble_data_mode + 1), BLE_DATA_MODES_COUNT);
   }
+  current_line ++;
+  // Auto scroll;
+  if (current_line == first_line_offset_) {
+    config_data_.auto_scroll = !config_data_.auto_scroll;
+  }  
   saveConfigToEprom();
   interrupts();
   publishNewConfigOnBLE();

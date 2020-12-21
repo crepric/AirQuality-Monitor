@@ -40,7 +40,7 @@
 // ==========================
 #define LCD_BL_TIMEOUT_MS 5000
 #define BTN_CHECK_INTERVAL_MS 200000
-#define LCD_REFRESH_INTERVAL 500
+#define LCD_REFRESH_INTERVAL 1000
 #define LCD_CONFIG_DISPLAY_DURATION 5000
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 // LCD buttons codes.
@@ -85,7 +85,7 @@ int visualization_line_counts_[] = {
   /* VISUALIZATION_PM_DATA */3,
   /* VISUALIZATION_PM_HIST */3,
   /* VISUALIZATION_TEMP_HUM */ 2,
-  /* VISUALIZATION_CONFIGS */ 4,
+  /* VISUALIZATION_CONFIGS */ 5,
 };
 
 // ======================
@@ -164,6 +164,8 @@ struct ConfigData {
   LcdBlModes lcd_bl_mode = LCD_BL_5S;
   PmSensorModes pm_dc_mode = PM_SENSOR_ALWAYS_ON;
   BLEDataModes ble_data_mode = BLE_SEND_ALWAYS;
+  // Visualization auto-scroll
+  bool auto_scroll = false;
 } config_data_;
 
 struct State {

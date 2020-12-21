@@ -64,14 +64,19 @@ void timerIsr() {
     // This will only matter if mode is 5s;
     state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
   }
+  bool config_page = config_data_.visualization == VISUALIZATION_CONFIGS;
   switch (lcd_key) {
     case btnDOWN:
-      first_line_offset_ = mod(first_line_offset_ + 1,
-                              visualization_line_counts_[config_data_.visualization]);
+      if (!config_data_.auto_scroll || config_page) {
+        first_line_offset_ = mod(first_line_offset_ + 1,
+                             visualization_line_counts_[config_data_.visualization]);
+      }
       break;
     case btnUP:
-      first_line_offset_ = mod( first_line_offset_ - 1,
-                               visualization_line_counts_[config_data_.visualization]);
+      if (!config_data_.auto_scroll || config_page) {
+        first_line_offset_ = mod(first_line_offset_ - 1,
+                                 visualization_line_counts_[config_data_.visualization]);
+      }
       break;
     case btnRIGHT:
       config_data_.visualization = (Views) mod(config_data_.visualization + 1,
@@ -84,7 +89,7 @@ void timerIsr() {
       first_line_offset_ = 0;
       break;
     case btnSELECT:
-      if (config_data_.visualization == VISUALIZATION_CONFIGS) {
+      if (config_page) {
         state_.select_pressed = true;
       }
     case btnNONE:
