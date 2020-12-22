@@ -48,10 +48,10 @@ void setupBLE() {
 }
 
 bool verifyConfigUpdates() {
-//  BLECentral central = blePeripheral.central();
-//  if (central) {
-//    // while the central is still connected to peripheral:
-//    if (central.connected()) {
+  BLECentral central = blePeripheral.central();
+  if (central) {
+    // while the central is still connected to peripheral:
+    if (central.connected()) {
       if (Config_Characteristic.written()) {
         unsigned long config_encoded;
         config_encoded = Config_Characteristic.value();
@@ -59,8 +59,8 @@ bool verifyConfigUpdates() {
         saveConfigToEprom();
         return true;
       }
-//    }
-//  }
+    }
+  }
   return false;
 }
 
