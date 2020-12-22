@@ -74,6 +74,7 @@ enum Views {
   VISUALIZATION_PM_HIST,
   VISUALIZATION_TEMP_HUM,
   VISUALIZATION_CONFIGS,
+  VISUALIZATION_STATE,
   VISUALIZATION_COUNT,
 };
 
@@ -88,6 +89,7 @@ int visualization_line_counts_[] = {
   /* VISUALIZATION_PM_HIST */3,
   /* VISUALIZATION_TEMP_HUM */ 2,
   /* VISUALIZATION_CONFIGS */ 5,
+  /* VISUALIZATION_STATE */ 5,
 };
 
 // ======================

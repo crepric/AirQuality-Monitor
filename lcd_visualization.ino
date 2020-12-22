@@ -148,6 +148,73 @@ void visualizeTempHumData() {
   }
 }
 
+// Visualize device state information
+void visualizeState() {
+  lcd.clear();
+  int current_line = 0;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("PM State: ");
+    if (state_.pm_active) {
+      lcd.print("ON");
+    } else {
+      lcd.print("OFF");
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("PM Timer: ");
+    if (state_.pm_active) {
+      lcd.print((state_.pm_off_time - millis())/1000);
+    } else {
+      lcd.print((state_.pm_on_time - millis())/1000);
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("LCD Timer: ");
+    if (config_data_.lcd_bl_mode == LCD_BL_5S ||
+        config_data_.lcd_bl_mode == LCD_BL_10S) {
+      if (state_.lcd_off_time == 0) {
+        lcd.print("Off");
+      } else {
+        lcd.print((state_.lcd_off_time - millis()) / 1000);
+      }
+    } else {
+      lcd.print("N/A");
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("BT Status: ");
+    BLECentral central = blePeripheral.central();
+    if (central) {
+      // while the central is still connected to peripheral:
+      if (central.connected()) {
+        lcd.print("Conn");
+      } else {
+        lcd.print("Disc");
+      }
+    } else {
+      lcd.print("Disc");
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("Config: ");
+    lcd.print(encodeConfigData(config_data_));
+  }
+}
+
 void refreshDisplay(bool config_changed) {
   if ((config_data_.lcd_bl_mode == LCD_BL_5S || 
        config_data_.lcd_bl_mode == LCD_BL_10S) && 
@@ -180,6 +247,9 @@ void refreshDisplay(bool config_changed) {
         toggleConfigOption();
         state_.select_pressed = false;
       }
+      break;
+    case VISUALIZATION_STATE:
+      visualizeState();
       break;
     default:
       break;
