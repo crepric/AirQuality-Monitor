@@ -38,9 +38,10 @@
 // ==========================
 // LCD definitions
 // ==========================
-#define LCD_BL_TIMEOUT_MS 5000
+#define LCD_BL_TIMEOUT_5000_MS 5000
+#define LCD_BL_TIMEOUT_10000_MS 10000
 #define BTN_CHECK_INTERVAL_MS 200000
-#define LCD_REFRESH_INTERVAL 1000
+#define LCD_REFRESH_INTERVAL 500
 #define LCD_CONFIG_DISPLAY_DURATION 5000
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 // LCD buttons codes.
@@ -60,6 +61,7 @@ enum LcdBlModes {
   LCD_BL_ON = 0,
   LCD_BL_OFF,
   LCD_BL_5S,
+  LCD_BL_10S,
   LCD_BL_MODES_COUNT // C defines enum as increments by 1, so this is the number of elements.
 };
 

@@ -65,6 +65,8 @@ void visualizeConfigMenu() {
       lcd.print(" ON");
     } else if (config_data_.lcd_bl_mode == LCD_BL_5S) {
       lcd.print(" 5s");
+    } else if (config_data_.lcd_bl_mode == LCD_BL_10S) {
+      lcd.print("10s");
     } else {
       lcd.print("OFF");
     }
@@ -136,10 +138,16 @@ void setConfigsFromEprom() {
 
 void setConfigsFromEncodedData(unsigned long encoded_config_data) {
   config_data_ = decodeConfigData(encoded_config_data);
-  if (config_data_.lcd_bl_mode == LCD_BL_ON || config_data_.lcd_bl_mode == LCD_BL_5S) {
+  if (config_data_.lcd_bl_mode == LCD_BL_ON ||
+      config_data_.lcd_bl_mode == LCD_BL_5S ||
+      config_data_.lcd_bl_mode == LCD_BL_10S) {
     digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
     // This will only matter if mode is 5s;
-    state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
+    if (config_data_.lcd_bl_mode == LCD_BL_5S) {
+      state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_5000_MS;
+    } else if (config_data_.lcd_bl_mode == LCD_BL_10S) {
+      state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_10000_MS;
+    }
   } else {
     digitalWrite(LCD_BACKLIGHT_PIN, LOW);
   }
@@ -169,10 +177,16 @@ void toggleConfigOption() {
   // LCD
   if (current_line == first_line_offset_) {
     config_data_.lcd_bl_mode = (LcdBlModes) mod((config_data_.lcd_bl_mode + 1), LCD_BL_MODES_COUNT);
-    if (config_data_.lcd_bl_mode == LCD_BL_ON || config_data_.lcd_bl_mode == LCD_BL_5S) {
+    if (config_data_.lcd_bl_mode == LCD_BL_ON || 
+        config_data_.lcd_bl_mode == LCD_BL_5S ||
+        config_data_.lcd_bl_mode == LCD_BL_10S) {
       digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
       // This will only matter if mode is 5s;
-      state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
+      if (config_data_.lcd_bl_mode == LCD_BL_5S) {
+        state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_5000_MS;
+      } else if (config_data_.lcd_bl_mode == LCD_BL_10S) {
+        state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_10000_MS;
+      }
     } else {
       digitalWrite(LCD_BACKLIGHT_PIN, LOW);
     }

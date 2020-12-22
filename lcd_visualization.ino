@@ -149,7 +149,10 @@ void visualizeTempHumData() {
 }
 
 void refreshDisplay(bool config_changed) {
-  if (config_data_.lcd_bl_mode == LCD_BL_5S && state_.lcd_off_time > 0 && state_.lcd_off_time < millis()) {
+  if ((config_data_.lcd_bl_mode == LCD_BL_5S || 
+       config_data_.lcd_bl_mode == LCD_BL_10S) && 
+      state_.lcd_off_time > 0 && 
+      state_.lcd_off_time < millis()) {
     digitalWrite(LCD_BACKLIGHT_PIN, LOW);
     state_.lcd_off_time = 0;
   }

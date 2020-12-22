@@ -59,10 +59,15 @@ void timerIsr() {
   if (lcd_key == btnNONE) {
     return;
   }
-  if (config_data_.lcd_bl_mode == LCD_BL_5S) {
+  if (config_data_.lcd_bl_mode == LCD_BL_5S ||
+      config_data_.lcd_bl_mode == LCD_BL_10S) {
     digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
     // This will only matter if mode is 5s;
-    state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_MS;
+    if (config_data_.lcd_bl_mode == LCD_BL_5S) {
+      state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_5000_MS;
+    } else if (config_data_.lcd_bl_mode == LCD_BL_10S) {
+      state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_10000_MS;
+    }
   }
   bool config_page = config_data_.visualization == VISUALIZATION_CONFIGS;
   switch (lcd_key) {
