@@ -82,11 +82,13 @@ void timerIsr() {
       config_data_.visualization = (Views) mod(config_data_.visualization + 1,
                           VISUALIZATION_COUNT);
       first_line_offset_ = 0;
+      saveConfigToEprom();
       break;
     case btnLEFT:
       config_data_.visualization = (Views) mod(config_data_.visualization - 1,
                           VISUALIZATION_COUNT);
       first_line_offset_ = 0;
+      saveConfigToEprom();
       break;
     case btnSELECT:
       if (config_page) {
