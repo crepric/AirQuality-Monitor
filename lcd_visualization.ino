@@ -211,7 +211,7 @@ void visualizeState() {
       current_line == first_line_offset_ + 1) {
     lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("Config: ");
-    lcd.print(encodeConfigData(config_data_));
+    lcd.print(encodeConfigData(config_data_), HEX);
   }
 }
 
@@ -228,7 +228,7 @@ void refreshDisplay(bool config_changed) {
     lcd.setCursor(0,0);
     lcd.print("New Config:");
     lcd.setCursor(0,1);
-    lcd.print(encodeConfigData(config_data_));
+    lcd.print(encodeConfigData(config_data_), HEX);
     return;
   }
   switch (config_data_.visualization) {
