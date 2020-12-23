@@ -88,12 +88,14 @@ void timerIsr() {
                           VISUALIZATION_COUNT);
       first_line_offset_ = 0;
       saveConfigToEprom();
+      publishNewConfigOnBLE();
       break;
     case btnLEFT:
       config_data_.visualization = (Views) mod(config_data_.visualization - 1,
                           VISUALIZATION_COUNT);
       first_line_offset_ = 0;
       saveConfigToEprom();
+      publishNewConfigOnBLE();
       break;
     case btnSELECT:
       if (config_page) {
