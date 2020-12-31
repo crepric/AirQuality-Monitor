@@ -17,22 +17,22 @@
 #include "common_defines.h"
 
 // Encodes the current config in a 4-byte bitset to be sent over BLE or stored in EEPROM
-//  -----------------------------------------------------------------------------------------------------
-// | Byte 4  | Byte 3  |                    byte  2               |               byte 1                 |
-//  -----------------------------------------------------------------------------------------------------
-// |  8 - 0  | 8 - 0   |   7 - 6 |   5   | 4 - 3    |     2 - 0   |    7 - 5    |     4  |    3 - 0      |
-//  -----------------------------------------------------------------------------------------------------
-// | UNUSED  | UNUSED  | UNUSED  | AU_SC | BLE_MODE | PM_DC_MODE  | LCD_BL_MODE | FAN_ON | VISUALIZATION |
-//  -----------------------------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------------------------------------
+// | Byte 4  |      Byte 3        |                    byte  2               |               byte 1                 |
+//  ----------------------------------------------------------------------------------------------------------------
+// |  8 - 0  | 8 - 3   |  2 - 0   |  7 - 6  |   5   |   4 - 3  |    2 - 0    |    7 - 5    |     4  |    3 - 0      |
+//  ----------------------------------------------------------------------------------------------------------------
+// | UNUSED  | UNUSED  | FAN MODE | UNUSED  | AU_SC | BLE_MODE | PM_DC_MODE  | LCD_BL_MODE | UNUSED | VISUALIZATION |
+//  ----------------------------------------------------------------------------------------------------------------
 unsigned long encodeConfigData(struct ConfigData config_data) {
   char byte_1 = (config_data.visualization & 0xF) |
-                (config_data.fan_on << 4) |
+                (0x0 << 4) | // Deprecated
                 ((config_data.lcd_bl_mode & 0x7) << 5);
   char byte_2 = (config_data.pm_dc_mode & 0x7) |
                 (config_data.ble_data_mode & 0x3) << 3 |
                 (config_data.auto_scroll << 5);
                 
-  char byte_3 = 0;
+  char byte_3 = config_data.fan_mode & 0x7;
   char byte_4 = 0;
   return byte_1 | byte_2 << 8 | byte_3 << 16 | byte_4 << 24;
 }
@@ -40,15 +40,17 @@ unsigned long encodeConfigData(struct ConfigData config_data) {
 struct ConfigData decodeConfigData(unsigned long encoded_config_data) {
   char byte_1 = encoded_config_data & 0xFF;
   char byte_2 = (encoded_config_data >> 8) & 0xFF;
+  char byte_3 = (encoded_config_data >> 16) & 0xFF;
+  char byte_4 = (encoded_config_data >> 24) & 0xFF;
   struct ConfigData res;
   // Byte 1.
   res.visualization = (Views) (byte_1 & 0xF);
-  res.fan_on = (byte_1 >> 4) & 0x1;
   res.lcd_bl_mode = (LcdBlModes) ((byte_1 >> 5) & 0x7);
   // Byte 2.
   res.pm_dc_mode = (PmSensorModes) (byte_2 & 0x7);
   res.ble_data_mode = (BLEDataModes) ((byte_2 >> 3) & 0x3);
   res.auto_scroll = (byte_2 >> 5) & 0x1;
+  res.fan_mode = (FanModes)((byte_3) & 0x7);
   return res;
 }
 
@@ -77,7 +79,15 @@ void visualizeConfigMenu() {
     lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("Fan: ");
     lcd.setCursor(12, current_line - first_line_offset_);
-    lcd.print(config_data_.fan_on ? "ON" : "OFF");
+    if (config_data_.fan_mode == FAN_MODE_10_MINS) {
+      lcd.print("10m");
+    } else if (config_data_.fan_mode == FAN_MODE_ON){
+      lcd.print(" ON");
+    } else if (config_data_.fan_mode == FAN_MODE_PM_SYNC){
+      lcd.print("Syn");
+    } else {
+      lcd.print("OFF");
+    }
   }
   current_line ++;
   if (current_line == first_line_offset_ ||
@@ -152,10 +162,6 @@ void setConfigsFromEncodedData(unsigned long encoded_config_data) {
     digitalWrite(LCD_BACKLIGHT_PIN, LOW);
   }
 
-
-  digitalWrite(FAN_CONTROL_PIN, config_data_.fan_on ? LOW : HIGH);
-
-
   if (config_data_.pm_dc_mode == PM_SENSOR_ALWAYS_ON || config_data_.pm_dc_mode == PM_SENSOR_15M) {
     digitalWrite(PM_SENSOR_SLEEP, HIGH);
     // This will only matter if mode is 15m;
@@ -164,6 +170,21 @@ void setConfigsFromEncodedData(unsigned long encoded_config_data) {
   } else {
     digitalWrite(PM_SENSOR_SLEEP, LOW);
     state_.pm_active = false;
+  }
+
+  if (config_data_.fan_mode == FAN_MODE_ON || 
+        config_data_.fan_mode == FAN_MODE_10_MINS) {
+      state_.fan_active = true;
+      digitalWrite(FAN_CONTROL_PIN, LOW);
+      if (config_data_.fan_mode == FAN_MODE_10_MINS) {
+        state_.fan_off_time = millis() + FAN_DC_ACTIVE_TIMEOUT_MS;
+      }
+    } else if(config_data_.fan_mode == FAN_MODE_PM_SYNC) {
+      state_.fan_active = state_.pm_active;
+      digitalWrite(FAN_CONTROL_PIN, state_.pm_active ? LOW:HIGH);
+    }else {
+      state_.fan_active = false;
+      digitalWrite(FAN_CONTROL_PIN, HIGH);
   }
 
 }
@@ -181,7 +202,6 @@ void toggleConfigOption() {
         config_data_.lcd_bl_mode == LCD_BL_5S ||
         config_data_.lcd_bl_mode == LCD_BL_10S) {
       digitalWrite(LCD_BACKLIGHT_PIN, HIGH);
-      // This will only matter if mode is 5s;
       if (config_data_.lcd_bl_mode == LCD_BL_5S) {
         state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_5000_MS;
       } else if (config_data_.lcd_bl_mode == LCD_BL_10S) {
@@ -194,8 +214,21 @@ void toggleConfigOption() {
   current_line ++;
   // FAN
   if (current_line == first_line_offset_) {
-    config_data_.fan_on = !config_data_.fan_on;
-    digitalWrite(FAN_CONTROL_PIN, config_data_.fan_on ? LOW : HIGH);
+    config_data_.fan_mode = (FanModes) mod((config_data_.fan_mode + 1), FAN_MODES_COUNT);
+    if (config_data_.fan_mode == FAN_MODE_ON || 
+        config_data_.fan_mode == FAN_MODE_10_MINS) {
+      state_.fan_active = true;
+      digitalWrite(FAN_CONTROL_PIN, LOW);
+      if (config_data_.fan_mode == FAN_MODE_10_MINS) {
+        state_.fan_off_time = millis() + FAN_DC_ACTIVE_TIMEOUT_MS;
+      }
+    } else if(config_data_.fan_mode == FAN_MODE_PM_SYNC) {
+      state_.fan_active = state_.pm_active;
+      digitalWrite(FAN_CONTROL_PIN, state_.pm_active ? LOW:HIGH);
+    } else {
+      state_.fan_active = false;
+      digitalWrite(FAN_CONTROL_PIN, HIGH);
+    }
   }
   current_line ++;
   // PM Sensor Duty Cicle
@@ -209,6 +242,10 @@ void toggleConfigOption() {
     } else {
       digitalWrite(PM_SENSOR_SLEEP, LOW);
       state_.pm_active = false;
+    }
+    if(config_data_.fan_mode == FAN_MODE_PM_SYNC) {
+      state_.fan_active = state_.pm_active;
+      digitalWrite(FAN_CONTROL_PIN, state_.pm_active ? LOW:HIGH);
     }
     //EEPROM.write(PM_SENSOR_DUTYCICLE_ADDRESS, config_data_.pm_dc_mode);
   }

@@ -83,6 +83,11 @@ bool readPMValues() {
     digitalWrite(PM_SENSOR_SLEEP, LOW);
     state_.pm_active = false;
     state_.pm_on_time = millis() + PM_INACTIVE_TIMEOUT_MS;
+    if (config_data_.fan_mode == FAN_MODE_PM_SYNC) {
+      state_.fan_active = false;
+      state_.fan_on_time = state_.pm_on_time;
+      digitalWrite(FAN_CONTROL_PIN, HIGH);
+    }
     return false;
   }
 
@@ -93,6 +98,11 @@ bool readPMValues() {
     digitalWrite(PM_SENSOR_SLEEP, HIGH);
     state_.pm_active = true;
     state_.pm_off_time = millis() + PM_ACTIVE_TIMEOUT_MS;
+    if (config_data_.fan_mode == FAN_MODE_PM_SYNC) {
+      state_.fan_active = true;
+      state_.fan_off_time = state_.pm_off_time;
+      digitalWrite(FAN_CONTROL_PIN, LOW);
+    }
     // Return false anyway to give sensor a bit of warmup.
     return false;
   }

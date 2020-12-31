@@ -152,6 +152,7 @@ void visualizeTempHumData() {
 void visualizeState() {
   lcd.clear();
   int current_line = 0;
+  // PM sensor
   if (current_line == first_line_offset_ ||
       current_line == first_line_offset_ + 1) {
     lcd.setCursor(0, current_line - first_line_offset_);
@@ -167,13 +168,52 @@ void visualizeState() {
       current_line == first_line_offset_ + 1) {
     lcd.setCursor(0, current_line - first_line_offset_);
     lcd.print("PM Timer: ");
-    if (state_.pm_active) {
-      lcd.print((state_.pm_off_time - millis())/1000);
+    if (config_data_.pm_dc_mode == PM_SENSOR_15M) {
+      if (state_.pm_active) {
+        lcd.print((state_.pm_off_time - millis())/1000);
+      } else {
+        lcd.print((state_.pm_on_time - millis())/1000);
+      }
     } else {
-      lcd.print((state_.pm_on_time - millis())/1000);
+      lcd.print("N/A");
     }
   }
   current_line ++;
+  // FAN
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("FAN State: ");
+    if (state_.fan_active) {
+      lcd.print("ON");
+    } else {
+      lcd.print("OFF");
+    }
+  }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("FAN Timer: ");
+    if (config_data_.fan_mode == FAN_MODE_10_MINS) {
+      if (state_.fan_active) {
+        lcd.print((state_.fan_off_time - millis())/1000);
+      } else {
+        lcd.print((state_.fan_on_time - millis())/1000);
+      }
+    } else if (config_data_.fan_mode == FAN_MODE_PM_SYNC &&
+               config_data_.pm_dc_mode == PM_SENSOR_15M) {
+      if (state_.fan_active) {
+        lcd.print((state_.pm_off_time - millis())/1000);
+      } else {
+        lcd.print((state_.pm_on_time - millis())/1000);
+      }
+    } else {
+      lcd.print("N/A");
+    }
+  }
+  current_line ++;
+  // LCD
   if (current_line == first_line_offset_ ||
       current_line == first_line_offset_ + 1) {
     lcd.setCursor(0, current_line - first_line_offset_);

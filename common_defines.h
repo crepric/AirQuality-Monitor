@@ -28,8 +28,20 @@
 // Configs
 // #define SERIAL_DEBUG
 
+// ==========================
+// FAN definitions
+// ==========================
 // FAN control pin
 #define FAN_CONTROL_PIN 0
+#define FAN_DC_ACTIVE_TIMEOUT_MS 60000 // 1 min
+#define FAN_DC_INACTIVE_TIMEOUT_MS 540000 // 9 min
+enum FanModes {
+  FAN_MODE_OFF = 0,
+  FAN_MODE_ON,
+  FAN_MODE_PM_SYNC,
+  FAN_MODE_10_MINS,
+  FAN_MODES_COUNT,
+};
 
 // Use of defines rather than enums mostly as a philosophy to save memory.
 // Symbol Definitions
@@ -164,7 +176,7 @@ struct ConfigData {
   // Defines the current visualization mode
   Views visualization = VISUALIZATION_PM_DATA;
   // Device config
-  bool fan_on = false;
+  FanModes fan_mode = FAN_MODE_OFF;
   LcdBlModes lcd_bl_mode = LCD_BL_5S;
   PmSensorModes pm_dc_mode = PM_SENSOR_ALWAYS_ON;
   BLEDataModes ble_data_mode = BLE_SEND_ALWAYS;
@@ -184,6 +196,10 @@ struct State {
   // If we are in config mode, and the select button is pressed,
   // the event is recorded and processed in the next loop.
   bool select_pressed = false;
+  // Fan duty cycle.
+  unsigned long fan_off_time = 0;
+  unsigned long fan_on_time = 0;
+  boolean fan_active = false;  // Start with fan off and let the saved config decide.
 } state_;
 
 #endif

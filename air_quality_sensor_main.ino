@@ -55,6 +55,19 @@ void setup() {
 // Doing so with an interrupt allows for responsiveness even
 // when the microcontroller is busy with readings
 void timerIsr() {
+  // Check if fan status must be changed
+  if(config_data_.fan_mode == FAN_MODE_10_MINS) {
+    if (state_.fan_active && state_.fan_off_time < millis()) {
+      state_.fan_active = false;
+      digitalWrite(FAN_CONTROL_PIN, HIGH);
+      state_.fan_on_time = millis() + FAN_DC_INACTIVE_TIMEOUT_MS;
+    } else if (!state_.fan_active && state_.fan_on_time < millis()) {
+      state_.fan_active = true;
+      digitalWrite(FAN_CONTROL_PIN, LOW);
+      state_.fan_off_time = millis() + FAN_DC_ACTIVE_TIMEOUT_MS;  
+    }
+  }
+  
   int lcd_key = read_LCD_buttons();
   if (lcd_key == btnNONE) {
     return;
@@ -69,6 +82,7 @@ void timerIsr() {
       state_.lcd_off_time = millis() + LCD_BL_TIMEOUT_10000_MS;
     }
   }
+  
   bool config_page = config_data_.visualization == VISUALIZATION_CONFIGS;
   switch (lcd_key) {
     case btnDOWN:
