@@ -24,9 +24,10 @@
 #include <EEPROM.h>
 #include <LiquidCrystal.h>
 #include <SoftwareSerial.h>
-
+#include <Wire.h>
+#include <Adafruit_BMP280.h>
 // Configs
-// #define SERIAL_DEBUG
+#define SERIAL_DEBUG
 
 // ==========================
 // FAN definitions
@@ -99,9 +100,9 @@ int first_line_offset_ = 0;
 int visualization_line_counts_[] = {
   /* VISUALIZATION_PM_DATA */3,
   /* VISUALIZATION_PM_HIST */3,
-  /* VISUALIZATION_TEMP_HUM */ 2,
+  /* VISUALIZATION_TEMP_HUM */ 3,
   /* VISUALIZATION_CONFIGS */ 5,
-  /* VISUALIZATION_STATE */ 5,
+  /* VISUALIZATION_STATE */ 7,
 };
 
 // ======================
@@ -112,6 +113,12 @@ int visualization_line_counts_[] = {
 #define DHTTYPE DHT22  // DHT 22  (AM2302)
 
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
+
+// ======================
+// Bar / Temp definitions
+// ======================
+// Adafruit BMP280
+Adafruit_BMP280 bmp; // I2C
 
 // =====================
 // PM definitions
@@ -169,6 +176,8 @@ struct AqData {
   // Variables for Temp/Hum sensor
   float hum = -1.0;  //Stores humidity value
   float temp = -1.0; //Stores temperature value
+  float temp2 = -1.0; //Stores temperature value received from BMP sensor
+  float press = -1.0; // Stores barometric pressure value
 } aq_data_, last_sent_aq_data_;
 
 // Configuration bits

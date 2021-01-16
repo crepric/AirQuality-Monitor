@@ -146,6 +146,14 @@ void visualizeTempHumData() {
     lcd.print(aq_data_.hum);
     lcd.print(" %");
   }
+  current_line ++;
+  if (current_line == first_line_offset_ ||
+      current_line == first_line_offset_ + 1) {
+    lcd.setCursor(0, current_line - first_line_offset_);
+    lcd.print("BP: ");
+    lcd.print((int) aq_data_.press);
+    lcd.print(" Pa");
+  }
 }
 
 // Visualize device state information

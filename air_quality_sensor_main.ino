@@ -39,6 +39,14 @@ void setup() {
 
   // Setup sensors
   dht.begin();
+  bmp.begin();  // Can return false if sensor init fails
+  /* Default settings from datasheet. */
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+  
   setupPMsensor();
 
   setupLCD();
@@ -155,6 +163,10 @@ void printToSerial() {
   Serial.print(aq_data_.temp);
   Serial.println(" Deg.");
 
+  Serial.print("Pressure ");
+  Serial.print(aq_data_.press);
+  Serial.println(" Pa");
+  
   Serial.println();
 }
 #endif
@@ -166,7 +178,9 @@ void loop() {
   // Temperature/Humidity readings
   aq_data_.hum = dht.readHumidity();
   aq_data_.temp = dht.readTemperature();
-  maybePublishTempHum(aq_data_.temp, aq_data_.hum);
+  aq_data_.press = bmp.readPressure();
+  aq_data_.temp2 = bmp.readTemperature();
+  maybePublishTempHumPress(aq_data_.temp, aq_data_.hum, aq_data_.press);
 
   // PM readings
   readPMValues();
