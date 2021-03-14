@@ -1,1 +1,55 @@
-hello
+<html>
+<head>
+<title>Air Quality Monitor</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src='js/script.js'></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="workspace">
+    <!-- Tab links -->
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'CurrentData')" id="defaultOpen">Current Data</button>
+      <button class="tablinks" onclick="openTab(event, 'Data')">Raw Data</button>
+      <button class="tablinks" onclick="openTab(event, 'Config')">Config</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="Data" class="tabcontent">
+      <h3>Raw Data</h3>
+      <p>Temperature: <span id='data_temp'></span> &#x2103</p>
+      <p>Humidity: <span id='data_hum'></span>%</p>
+      <p>Pressure: <span id='data_press'></span> Pa</p>
+      <p>PM 1.0: <span id='data_pm1'></span> &microg/m&sup3;</p>
+      <p>PM 2.5: <span id='data_pm25'></span> &microg/m&sup3;</p>
+      <p>PM 10: <span id='data_pm10'></span> &microg/m&sup3;</p>
+      <p>Last Update: <span id='last_update'></span></p>
+    </div>
+
+    <div id="Config" class="tabcontent">
+      <h3>Config</h3>
+      <div id="config_values"></div>
+    </div>
+
+    <div id="CurrentData" class="tabcontent">
+      <div id="chart_wrapper">
+        <div id="temp_chart" class="chart"></div>
+        <div id="pressure_chart" class="chart"></div>
+        <div id="humidity_chart" class="chart"></div>
+        <div id="pm1_chart" class="chart"></div>
+        <div id="pm25_chart" class="chart"></div>
+        <div id="pm10_chart" class="chart"></div>
+      </div>
+      <div id="extra_data" class="chart">
+        <div id="update_age_box"> Last update: <span id="last_update_age"></div>
+      </div>
+    </div>
+</div>
+
+<script>
+  document.getElementById("defaultOpen").click();
+  getConfigValues();
+  setInterval(getCurrentData, 2000);
+</script>
+
+</html>

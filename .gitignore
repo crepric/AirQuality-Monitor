@@ -1,0 +1,6 @@
+controller/__pycache__/
+controller/bazel-bin
+controller/bazel-controller
+controller/bazel-out
+controller/bazel-testlogs
+

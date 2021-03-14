@@ -28,7 +28,9 @@ def main(argv):
     data_manager = AqmDataManager()
     controller = AqmController(config_manager, data_manager)
     controller.connect()
+    controller.simulate()
     webservice.startServer(config_manager, data_manager)
+    controller.stopSimulation()
     pass
 
 

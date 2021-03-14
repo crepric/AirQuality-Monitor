@@ -1,0 +1,141 @@
+html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#workspace {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  height: 50px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+  overflow: hidden;
+  height: calc(100% - 50px);
+}
+
+#Config {
+  display: none;
+  overflow: scroll;
+}
+
+.tabcontent {
+  animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+#chart_wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 10px;
+  grid-template-rows: repeat(2, 1fr);
+  grid-row-gap: 10px;
+}
+
+#temp_chart {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#humidity_chart {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#pm1_chart, #pm25_chart, #pm10_chart {
+  grid-column: 1fr;
+  grid-row: 2;
+}
+
+#update_age_box {
+  opacity: 1;
+}
+
+.chart {
+  max-width: 100%;
+}
+
+.chart text {
+  font-size: 12;
+}
+
+.radio-toolbar {
+  margin: 10px;
+}
+
+/* ============== */
+
+.radio-toolbar input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+
+.radio-toolbar label {
+    display: inline-block;
+    background-color: #ddd;
+    padding: 10px 20px;
+    font-family: sans-serif, Arial;
+    font-size: 16px;
+    border: 2px solid #444;
+    border-radius: 4px;
+    width: 140px;
+    text-align: center;
+}
+
+.radio-toolbar label:hover {
+    background-color: #dfd;
+}
+
+.radio-toolbar input[type="radio"]:focus + label {
+    border: 2px dashed #444;
+}
+
+.radio-toolbar input[type="radio"]:checked + label {
+    background-color: #bfb;
+    border-color: #4c4;
+}
+

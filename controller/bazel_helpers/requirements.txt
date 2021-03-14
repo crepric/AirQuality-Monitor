@@ -1,0 +1,2 @@
+ipython==7.8.0 \
+  --hash=sha256:c4ab005921641e40a68e405e286e7a1fcc464497e14d81b6914b4fd95e5dee9b

@@ -14,18 +14,21 @@
 # along with Net Failover Manager.  If not, see <https://www.gnu.org/licenses/>.
 
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//bazel_helpers:ipython.bzl", "ipython")
+load("@mypy_integration//:mypy.bzl", "mypy_test")
 
 py_binary(
     name = "aqm_main",
-    srcs = ["aqm_main.py",
-            "aqm_controller.py"
-           ],
+    srcs = ["aqm_main.py"],
     python_version = "PY3",
     data = [
         ":html_templates",
         ":static_resources",
     ],
     deps = [
+        ":aqm_controller_lib",
+        ":aqm_config_manager_lib",
+        ":aqm_data_manager_lib",
         "@com_github_abseil_abseil_py//absl:app",
         "@com_github_abseil_abseil_py//absl/flags",
         "@com_github_abseil_abseil_py//absl/logging",
@@ -44,7 +47,45 @@ filegroup(
     name = "static_resources",
     srcs = glob([
         "web/resources/js/*",
-        "web/aresources/css/*",
+        "web/resources/css/*",
     ]),
 )
 
+py_library(
+    name = "aqm_data_manager_lib",
+    srcs = ["aqm_data_manager.py"],
+    deps = [
+        "@com_github_abseil_abseil_py//absl/logging",
+    ]
+)
+
+py_library(
+    name = "aqm_config_manager_lib",
+    srcs = ["aqm_config_manager.py"],
+    deps = [
+        "@com_github_abseil_abseil_py//absl/logging",
+    ]
+)
+
+py_library(
+    name = "aqm_controller_lib",
+    srcs = ["aqm_controller.py"],
+    deps = [
+        "@com_github_abseil_abseil_py//absl/logging",
+        "@crepric_pygatt//pygatt:pygatt_lib",
+    ]
+)
+
+ipython(
+    name = "shell",
+    deps = [
+        ":aqm_data_manager_lib",
+        ":aqm_config_manager_lib",
+        ":aqm_controller_lib"
+    ],
+)
+
+mypy_test(
+    name = "aqm_main_mypy",
+    deps = [":aqm_main"],
+)

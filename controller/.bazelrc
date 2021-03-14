@@ -1,0 +1,5 @@
+# mypy typechecker enabled in every build
+
+build --aspects @mypy_integration//:mypy.bzl%mypy_aspect
+build --output_groups=+mypy
+build --host_javabase=@local_jdk//:jdk
