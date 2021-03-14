@@ -16,6 +16,7 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//bazel_helpers:ipython.bzl", "ipython")
 load("@mypy_integration//:mypy.bzl", "mypy_test")
+load("@my_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "aqm_main",
@@ -29,6 +30,7 @@ py_binary(
         ":aqm_controller_lib",
         ":aqm_config_manager_lib",
         ":aqm_data_manager_lib",
+        ":webservice_lib",
         "@com_github_abseil_abseil_py//absl:app",
         "@com_github_abseil_abseil_py//absl/flags",
         "@com_github_abseil_abseil_py//absl/logging",
@@ -71,8 +73,18 @@ py_library(
     name = "aqm_controller_lib",
     srcs = ["aqm_controller.py"],
     deps = [
+        requirement("retry"),
         "@com_github_abseil_abseil_py//absl/logging",
         "@crepric_pygatt//pygatt:pygatt_lib",
+    ]
+)
+
+py_library(
+    name = "webservice_lib",
+    srcs = ["webservice.py"],
+    deps = [
+        "@com_github_abseil_abseil_py//absl/logging",
+        requirement("Flask"),
     ]
 )
 

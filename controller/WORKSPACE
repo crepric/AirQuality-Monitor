@@ -69,6 +69,10 @@ py_repositories()
 
 load("@rules_python//python:pip.bzl", "pip_repositories", "pip_import", "pip_install")
 
+pip_install(
+    name = "my_deps",
+    requirements = "//external:requirements.txt",
+)
 
 # Dependency for GRPC, a cheap trick to import SIX which is needed
 # by gflags. Simply importing SIX alone doesn't work, the compilation
