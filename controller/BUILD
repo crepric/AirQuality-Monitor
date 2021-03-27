@@ -58,6 +58,7 @@ py_library(
     srcs = ["aqm_data_manager.py"],
     deps = [
         "@com_github_abseil_abseil_py//absl/logging",
+        requirement("redistimeseries"),
     ]
 )
 

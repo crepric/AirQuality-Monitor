@@ -25,13 +25,12 @@ from aqm_data_manager import AqmDataManager
 
 def main(argv):
     config_manager = AqmConfigManager()
-    data_manager = AqmDataManager()
-    controller = AqmController(config_manager, data_manager)
-    controller.connect()
-    controller.simulate()
-    webservice.startServer(config_manager, data_manager)
-    controller.stopSimulation()
-    pass
+    with AqmDataManager() as data_manager:
+        controller = AqmController(config_manager, data_manager)
+        controller.connect()
+        controller.simulate()
+        webservice.startServer(config_manager, data_manager)
+        controller.stopSimulation()
 
 
 if __name__ == '__main__':
