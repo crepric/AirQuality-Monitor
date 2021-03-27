@@ -153,11 +153,12 @@ class RedisManager(Thread):
                     rawkey = '%s:1' % metric
                     data = self._metrics[metric]['get'].fget(
                         self._data_manager)
-                    logging.info('%s, %s', data, rawkey)
-                    self._client.add(
-                        rawkey, '*', data)
+                    if data != -100:
+                        logging.info('%s, %s', data, rawkey)
+                        self._client.add(
+                            rawkey, '*', data)
 
-                except e:
+                except:
                     logging.exception('Failure while recording %s', metric)
             self._stopped.wait(10)
         logging.info("Thread is done.")
@@ -184,12 +185,12 @@ class AqmDataManager(object):
 
     def __init__(self):
         self._current_data: Data = {
-            'temp': -1,
-            'hum': -1,
-            'bmp': -1,
-            'pm1': -1,
-            'pm25': -1,
-            'pm10': -1,
+            'temp': -100,
+            'hum': -100,
+            'bmp': -100,
+            'pm1': -100,
+            'pm25': -100,
+            'pm10': -100,
         }
 
     def __enter__(self):
