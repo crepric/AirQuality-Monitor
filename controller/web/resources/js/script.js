@@ -337,11 +337,10 @@ function drawPMHistoryCharts() {
   histcharts.pm.data.addColumn('number', 'PM 1.0');
   histcharts.pm.data.addColumn('number', 'PM 2.5');
   histcharts.pm.data.addColumn('number', 'PM 10');
-  histcharts.pm.data.addRows([[new Date(),0,0,0]]);
-  histcharts.pm.chart.draw(histcharts.pm.data, {
-    displayAnnotations: true,
-    displayZoomButtons: false
-  });
+  updateHistory('pm');
+  setInterval(()=> {
+    updateHistory('pm');
+  }, 10000);
 }
 
 

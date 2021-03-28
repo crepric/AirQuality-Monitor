@@ -286,7 +286,7 @@ class RedisManager(Thread):
     @property
     def pm10_last_month(self):
         return self.get_history(
-            metric='pm10:25', granularity='1hr',
+            metric='pm10:1', granularity='1hr',
             time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
 
 
