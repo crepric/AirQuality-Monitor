@@ -1,3 +1,45 @@
+google.charts.load('current', {'packages':['gauge', 'annotatedtimeline']});
+
+// =================================================
+// Tab handling logic
+// =================================================
+function openTab(evt, tabName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+function initialize_handlers() {
+  console.log("Initialize");
+  document.getElementById("defaultOpen").click();
+  document.querySelectorAll(".duration_btn").forEach(
+    (btn) => {
+      btn.addEventListener('click', (e) => {
+           histcharts[e.path[1].dataset.metric].current_duration = e.path[0].dataset.duration;
+      updateHistory(e.path[1].dataset.metric);
+      });
+    }
+  )
+}
+
+// =================================================
+// Config Tab
+// =================================================
+// Populate the config tab with all valid options, and schedule refresh cycle.
 function initializeConfigTab(elements) {
   let container = document.getElementById('config_values');
   for (let config in elements) {
@@ -25,32 +67,7 @@ function initializeConfigTab(elements) {
   setInterval(getCurrentConfig, 5000);
 }
 
-
-google.charts.load('current', {'packages':['gauge']});
-google.charts.setOnLoadCallback(drawPMChart);
-google.charts.setOnLoadCallback(drawWeatherCharts);
-
-function openTab(evt, tabName) {
-  // Declare all variables
-  var i, tabcontent, tablinks;
-
-  // Get all elements with class="tabcontent" and hide them
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-
-  // Get all elements with class="tablinks" and remove the class "active"
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-
-  // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
-}
-
+// Get possible config values.
 function getConfigValues() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -62,6 +79,33 @@ function getConfigValues() {
   xhttp.send();
 }
 
+// Populate the config values with the received data.
+function populateConfig(config_data) {
+  for (let key in config_data) {
+    let button_line = document.getElementById(key);
+    for (let i = 0; i < button_line.childElementCount; i++) {
+      if (button_line.children[i].value == config_data[key][0]) {
+        button_line.children[i].checked = true;
+      }
+    }
+  }
+}
+
+// Get current config data.
+function getCurrentConfig() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      populateConfig(JSON.parse(this.responseText));
+    }
+  };
+  xhttp.open("GET", "/current_config", true);
+  xhttp.send();
+}
+
+// =================================================
+// Current Raw Data
+// =================================================
 function populateData(config_data) {
   let parsed_response = JSON.parse(config_data);
   let parsed_data = parsed_response.data;
@@ -108,27 +152,12 @@ function getCurrentData() {
   xhttp.send();
 }
 
-function populateConfig(config_data) {
-  for (let key in config_data) {
-    let button_line = document.getElementById(key);
-    for (let i = 0; i < button_line.childElementCount; i++) {
-      if (button_line.children[i].value == config_data[key][0]) {
-        button_line.children[i].checked = true;
-      }
-    }
-  }
-}
 
-function getCurrentConfig() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      populateConfig(JSON.parse(this.responseText));
-    }
-  };
-  xhttp.open("GET", "/current_config", true);
-  xhttp.send();
-}
+// =================================================
+// Gauges for continuous data
+// =================================================
+google.charts.setOnLoadCallback(drawPMChart);
+google.charts.setOnLoadCallback(drawWeatherCharts);
 
 var pm1_data;
 var pm25_data;
@@ -136,6 +165,7 @@ var pm10_data;
 var temp_data;
 var humidity_data;
 var pressure_data;
+var temperature_timeline_data;
 
 var pm_chart_options;
 var temp_chart_options;
@@ -177,11 +207,14 @@ function drawPMChart() {
      min: 0,
   };
 
-  pm1_chart = new google.visualization.Gauge(document.getElementById('pm1_chart'));
+  pm1_chart = new google.visualization.Gauge(
+      document.getElementById('pm1_chart'));
   pm1_chart.draw(pm1_data, pm_chart_options);
-  pm25_chart = new google.visualization.Gauge(document.getElementById('pm25_chart'));
+  pm25_chart = new google.visualization.Gauge(
+      document.getElementById('pm25_chart'));
   pm25_chart.draw(pm25_data, pm_chart_options);
-  pm10_chart = new google.visualization.Gauge(document.getElementById('pm10_chart'));
+  pm10_chart = new google.visualization.Gauge(
+      document.getElementById('pm10_chart'));
   pm10_chart.draw(pm10_data, pm_chart_options);
 };
 
@@ -200,7 +233,6 @@ function drawWeatherCharts() {
      ['Label', 'Value'],
      ['Pressure (mbar)', 0]
   ]);
-
 
   temp_chart_options = {
      redFrom: 30, redTo: 40,
@@ -235,11 +267,108 @@ function drawWeatherCharts() {
      min: 923,
   };
 
-  temp_chart = new google.visualization.Gauge(document.getElementById('temp_chart'));
+  temp_chart = new google.visualization.Gauge(
+      document.getElementById('temp_chart'));
   temp_chart.draw(temp_data, temp_chart_options);
-  humidity_chart = new google.visualization.Gauge(document.getElementById('humidity_chart'));
+  humidity_chart = new google.visualization.Gauge(
+      document.getElementById('humidity_chart'));
   humidity_chart.draw(humidity_data, humidity_chart_options);
-  pressure_chart = new google.visualization.Gauge(document.getElementById('pressure_chart'));
+  pressure_chart = new google.visualization.Gauge(
+      document.getElementById('pressure_chart'));
   pressure_chart.draw(pressure_data, pressure_chart_options);
 };
+
+// =================================================
+// Temperature history
+// =================================================
+google.charts.setOnLoadCallback(drawTempHistoryCharts);
+google.charts.setOnLoadCallback(drawHumHistoryCharts);
+google.charts.setOnLoadCallback(drawBMPHistoryCharts);
+google.charts.setOnLoadCallback(drawPMHistoryCharts);
+
+var histcharts = {
+  temp: {chart: null, data:null, key:'temp', current_duration:'hour'},
+  hum: {chart: null, data:null, key:'hum', current_duration:'hour'},
+  bmp: {chart: null, data:null, key:'bmp', current_duration:'hour'},
+  pm: {chart: null, data:null, key:'pm1:pm25:pm10', current_duration:'hour'},
+}
+
+function drawTempHistoryCharts() {
+  histcharts.temp.chart = new google.visualization.AnnotatedTimeLine(
+      document.getElementById('temp_chart_div'));
+  histcharts.temp.data = new google.visualization.DataTable();
+  histcharts.temp.data.addColumn('datetime', 'Time');
+  histcharts.temp.data.addColumn('number', 'Temp');
+  updateHistory('temp');
+  setInterval(()=> {
+    updateHistory('temp');
+  }, 10000);
+}
+
+function drawHumHistoryCharts() {
+  histcharts.hum.chart = new google.visualization.AnnotatedTimeLine(
+      document.getElementById('hum_chart_div'));
+  histcharts.hum.data = new google.visualization.DataTable();
+  histcharts.hum.data.addColumn('datetime', 'Time');
+  histcharts.hum.data.addColumn('number', 'Hum (%)');
+  updateHistory('hum');
+  setInterval(()=> {
+    updateHistory('hum');
+  }, 10000);
+}
+
+function drawBMPHistoryCharts() {
+  histcharts.bmp.chart = new google.visualization.AnnotatedTimeLine(
+      document.getElementById('bmp_chart_div'));
+  histcharts.bmp.data = new google.visualization.DataTable();
+  histcharts.bmp.data.addColumn('datetime', 'Time');
+  histcharts.bmp.data.addColumn('number', 'Bmp (mbar)');
+  updateHistory('bmp');
+  setInterval(()=> {
+    updateHistory('bmp');
+  }, 10000);
+}
+
+function drawPMHistoryCharts() {
+  histcharts.pm.chart = new google.visualization.AnnotatedTimeLine(
+      document.getElementById('pm_chart_div'));
+  histcharts.pm.data = new google.visualization.DataTable();
+  histcharts.pm.data.addColumn('datetime', 'Time');
+  histcharts.pm.data.addColumn('number', 'PM 1.0');
+  histcharts.pm.data.addColumn('number', 'PM 2.5');
+  histcharts.pm.data.addColumn('number', 'PM 10');
+  histcharts.pm.data.addRows([[new Date(),0,0,0]]);
+  histcharts.pm.chart.draw(histcharts.pm.data, {
+    displayAnnotations: true,
+    displayZoomButtons: false
+  });
+}
+
+
+function updateHistory(metric) {
+  let duration = histcharts[metric].current_duration;
+  let graph = histcharts[metric];
+  let key = histcharts[metric].key;
+  endpoint = '/history?metric=' + key +
+             '&duration=' + duration;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      drawTempTimeline(JSON.parse(this.responseText).data, graph);
+    }
+  };
+  xhttp.open('GET', endpoint, true);
+  xhttp.send();
+}
+
+function drawTempTimeline(data, graph) {
+  graph.data.removeRows(0, graph.data.getNumberOfRows()-1);
+  let converted_data = data.map((x) => { x[0] = new Date(x[0]); return x;});
+  graph.data.addRows(converted_data);
+  graph.chart.draw(graph.data, {
+      displayAnnotations: true,
+      displayZoomButtons : false
+  });
+  graph.chart.setVisibleChartRange(null, null);
+}
 

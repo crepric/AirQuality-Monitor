@@ -67,7 +67,7 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   to {opacity: 1;}
 }
 
-#chart_wrapper {
+.chart_wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 10px;
@@ -139,3 +139,9 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
     border-color: #4c4;
 }
 
+.histchart {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
+}

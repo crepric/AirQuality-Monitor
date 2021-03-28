@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, jsonify, request, abort, Blueprint, current_app
 from rules_python.python.runfiles import runfiles
+from aqm_data_manager import RedisManager
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -23,8 +24,14 @@ def create_app(aqm_config_manager, aqm_data_manager):
     app = Flask(__name__)
     app.config['CM'] = aqm_config_manager
     app.config['DM'] = aqm_data_manager
+    app.config['RM'] = aqm_data_manager.redis_manager
     app.register_blueprint(flaskbp)
     return app
+
+
+@flaskbp.errorhandler(400)
+def resource_not_found(e):
+    return jsonify(error=str(e)), 400
 
 
 @flaskbp.route('/')
@@ -44,6 +51,32 @@ def serve_current_data():
             'data': current_app.config['DM'].current_data,
             'age': str(current_app.config['DM'].last_update_age),
             'last_update': current_app.config['DM'].last_update,
+        }
+    )
+
+
+@flaskbp.route('/history', methods=['GET'])
+def history():
+    metrics = request.args.get('metric', default=None)
+    duration = request.args.get('duration', default=None)
+    if not metrics or not duration:
+        logging.warning('Incomplete data request, ignoring')
+        abort(400, 'Data request incomplete, specify metric and duration')
+    metrics = metrics.split(':')
+    data = []
+    for metric in metrics:
+        method_string = '%s_last_%s' % (metric, duration)
+        method = getattr(RedisManager, method_string, None)
+        if not method:
+            logging.warning('method %s not recognized', method)
+            abort(400, 'Method not recognized')
+        data.append(method.fget(current_app.config['RM']))
+    final_data = zip(
+        [x[0] for x in data[0][:]],
+        *[[x[1] for x in data[i][:]] for i in range(len(data))])
+    return jsonify(
+        {
+            'data': list(final_data)
         }
     )
 

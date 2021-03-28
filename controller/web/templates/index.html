@@ -12,6 +12,10 @@
       <button class="tablinks" onclick="openTab(event, 'CurrentData')" id="defaultOpen">Current Data</button>
       <button class="tablinks" onclick="openTab(event, 'Data')">Raw Data</button>
       <button class="tablinks" onclick="openTab(event, 'Config')">Config</button>
+      <button class="tablinks" onclick="openTab(event, 'TempGraph')">Temperature</button>
+      <button class="tablinks" onclick="openTab(event, 'HumidityGraph')">Humidity</button>
+      <button class="tablinks" onclick="openTab(event, 'BmpGraph')">BMP</button>
+      <button class="tablinks" onclick="openTab(event, 'PMGraph')">Particulate</button>
     </div>
 
     <!-- Tab content -->
@@ -32,7 +36,7 @@
     </div>
 
     <div id="CurrentData" class="tabcontent">
-      <div id="chart_wrapper">
+      <div class="chart_wrapper">
         <div id="temp_chart" class="chart"></div>
         <div id="pressure_chart" class="chart"></div>
         <div id="humidity_chart" class="chart"></div>
@@ -44,10 +48,47 @@
         <div id="update_age_box"> Last update: <span id="last_update_age"></div>
       </div>
     </div>
+
+    <div id="TempGraph" class="tabcontent" data-metric="temp">
+      <div class="chart_wrapper">
+        <div id='temp_chart_div' class='histchart'></div>
+      </div>
+      <button class="duration_btn" data-duration="hour">1 Hour</button>
+      <button class="duration_btn" data-duration="day">1 Day</button>
+      <button class="duration_btn" data-duration="month">1 Month</button>
+    </div>
+
+    <div id="HumidityGraph" class="tabcontent" data-metric="hum">
+      <div class="chart_wrapper">
+        <div id='hum_chart_div' class='histchart'></div>
+      </div>
+      <button class="duration_btn" data-duration="hour">1 Hour</button>
+      <button class="duration_btn" data-duration="day">1 Day</button>
+      <button class="duration_btn" data-duration="month">1 Month</button>
+    </div>
+
+    <div id="BmpGraph" class="tabcontent" data-metric="bmp">
+      <div class="chart_wrapper">
+        <div id='bmp_chart_div' class='histchart'></div>
+      </div>
+      <button class="duration_btn" data-duration="hour">1 Hour</button>
+      <button class="duration_btn" data-duration="day">1 Day</button>
+      <button class="duration_btn" data-duration="month">1 Month</button>
+    </div>
+
+    <div id="PMGraph" class="tabcontent" data-metric="pm">
+      <div class="chart_wrapper">
+        <div id='pm_chart_div' class='histchart'></div>
+      </div>
+      <button class="duration_btn" data-duration="hour">1 Hour</button>
+      <button class="duration_btn" data-duration="day">1 Day</button>
+      <button class="duration_btn" data-duration="month">1 Month</button>
+    </div>
+
 </div>
 
 <script>
-  document.getElementById("defaultOpen").click();
+  initialize_handlers();
   getConfigValues();
   setInterval(getCurrentData, 2000);
 </script>

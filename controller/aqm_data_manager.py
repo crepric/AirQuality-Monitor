@@ -19,7 +19,7 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 from redistimeseries.client import Client
 from threading import Thread, Event
-from typing import TypedDict, Callable, Type
+from typing import Callable, List, Optional, Type, TypedDict
 
 FLAGS = flags.FLAGS
 
@@ -164,19 +164,130 @@ class RedisManager(Thread):
         logging.info("Thread is done.")
 
     @property
-    def last_hour(self):
-        return self._client.range('temperature:1min:1',
-                                  int(time.time()) - 60*60*1000, '+')
+    def metrics_keys(self) -> List[str]:
+        return ['%s:1' % m for m in self._metrics.keys()]
+
+    def get_history(self, metric: str, granularity: str,
+                    time_from: Optional[int], time_to: Optional[int]):
+        metric_key = '%s:%s' % (metric, granularity)
+        values = []  # type: ignore
+        try:
+            values = self._client.range(
+                metric_key,
+                time_from if time_from else '-',
+                time_to if time_to else '+')
+        except:
+            logging.exception('Failed to retrieve data')
+        return values
+
+    # TODO: cleanup this code, remove redundancy.
+    @property
+    def temp_last_hour(self):
+        return self.get_history(
+            metric='temperature:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
 
     @property
-    def last_day(self):
-        return self._client.range('temperature:10min:1',
-                                  int(time.time()) - 24*60*60*1000, '+')
+    def temp_last_day(self):
+        return self.get_history(
+            metric='temperature:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
 
     @property
-    def last_month(self):
-        return self._client.range('temperature:1hr:1',
-                                  int(time.time()) - 30*24*60*60*1000, '+')
+    def temp_last_month(self):
+        return self.get_history(
+            metric='temperature:1', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
+
+    @property
+    def hum_last_hour(self):
+        return self.get_history(
+            metric='humidity:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
+
+    @property
+    def hum_last_day(self):
+        return self.get_history(
+            metric='humidity:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
+
+    @property
+    def hum_last_month(self):
+        return self.get_history(
+            metric='humidity:1', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
+
+    @property
+    def bmp_last_hour(self):
+        return self.get_history(
+            metric='bmp:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
+
+    @property
+    def bmp_last_day(self):
+        return self.get_history(
+            metric='bmp:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
+
+    @property
+    def bmp_last_month(self):
+        return self.get_history(
+            metric='bmp:1', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
+
+    @property
+    def pm1_last_hour(self):
+        return self.get_history(
+            metric='pm1:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
+
+    @property
+    def pm1_last_day(self):
+        return self.get_history(
+            metric='pm1:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
+
+    @property
+    def pm1_last_month(self):
+        return self.get_history(
+            metric='pm1:1', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
+
+    @property
+    def pm25_last_hour(self):
+        return self.get_history(
+            metric='pm25:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
+
+    @property
+    def pm25_last_day(self):
+        return self.get_history(
+            metric='pm25:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
+
+    @property
+    def pm25_last_month(self):
+        return self.get_history(
+            metric='pm25:1', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
+
+    @property
+    def pm10_last_hour(self):
+        return self.get_history(
+            metric='pm10:1', granularity='1min',
+            time_from=int(time.time())*1000 - 60*60*1000, time_to=None)
+
+    @property
+    def pm10_last_day(self):
+        return self.get_history(
+            metric='pm10:1', granularity='10min',
+            time_from=int(time.time())*1000 - 24*60*60*1000, time_to=None)
+
+    @property
+    def pm10_last_month(self):
+        return self.get_history(
+            metric='pm10:25', granularity='1hr',
+            time_from=int(time.time())*1000 - 30*24*60*60*1000, time_to=None)
 
 
 class AqmDataManager(object):
