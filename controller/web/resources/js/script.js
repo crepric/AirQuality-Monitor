@@ -19,8 +19,15 @@ function openTab(evt, tabName) {
   }
 
   // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(tabName).style.display = "block";
+  let element = document.getElementById(tabName)
+  element.style.display = element.dataset.display;
   evt.currentTarget.className += " active";
+  let maybe_chart = element.querySelector(".chart_wrapper");
+  if (maybe_chart) {
+    updateHistory(maybe_chart.parentElement.dataset.metric);
+  } else {
+    console.log("Nope");
+  }
 }
 
 function initialize_handlers() {
@@ -29,8 +36,8 @@ function initialize_handlers() {
   document.querySelectorAll(".duration_btn").forEach(
     (btn) => {
       btn.addEventListener('click', (e) => {
-           histcharts[e.path[1].dataset.metric].current_duration = e.path[0].dataset.duration;
-      updateHistory(e.path[1].dataset.metric);
+           histcharts[e.path[2].dataset.metric].current_duration = e.path[0].dataset.duration;
+      updateHistory(e.path[2].dataset.metric);
       });
     }
   )

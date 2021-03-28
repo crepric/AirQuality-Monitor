@@ -18,18 +18,20 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   overflow: hidden;
   border: 1px solid #ccc;
   background-color: #f1f1f1;
-  height: 50px;
+  height: 80px;
 }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
   background-color: inherit;
   float: left;
-  border: none;
+  border: 1px solid #ddd;
   outline: none;
   cursor: pointer;
   padding: 14px 16px;
   transition: 0.3s;
+  font-size: 18;
+  height: 100%;
 }
 
 /* Change background color of buttons on hover */
@@ -49,7 +51,7 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   border: 1px solid #ccc;
   border-top: none;
   overflow: hidden;
-  height: calc(100% - 50px);
+  height: calc(100% - 12px);
 }
 
 #Config {
@@ -58,7 +60,22 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
 }
 
 .tabcontent {
+  display: grid;
   animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+#tabs {
+  height: calc(100% - 80px - 60px);
+}
+
+.button_bar {
+  height: 50px;
+  margin-bottom: 100%;
+}
+
+#extra_data {
+  height: 50px;
+  clear: both;
 }
 
 /* Go from zero to full opacity */
@@ -67,7 +84,7 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   to {opacity: 1;}
 }
 
-.chart_wrapper {
+.gauge_wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 10px;
@@ -75,19 +92,10 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   grid-row-gap: 10px;
 }
 
-#temp_chart {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-#humidity_chart {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-#pm1_chart, #pm25_chart, #pm10_chart {
-  grid-column: 1fr;
-  grid-row: 2;
+.chart_wrapper {
+  display: grid;
+  height: calc(100% - 50px);
+  clear:both;
 }
 
 #update_age_box {
@@ -140,8 +148,7 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
 }
 
 .histchart {
-    grid-column-start: 1;
-    grid-column-end: 3;
-    grid-row-start: 1;
-    grid-row-end: 2;
+    position: relative;
+    height: 100%;
+    width: 100%;
 }

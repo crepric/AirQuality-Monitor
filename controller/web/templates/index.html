@@ -17,74 +17,82 @@
       <button class="tablinks" onclick="openTab(event, 'BmpGraph')">BMP</button>
       <button class="tablinks" onclick="openTab(event, 'PMGraph')">Particulate</button>
     </div>
+    <div id="tabs">
+        <!-- Tab content -->
+        <div id="Data" class="tabcontent" data-display="block">
+          <h3>Raw Data</h3>
+          <p>Temperature: <span id='data_temp'></span> &#x2103</p>
+          <p>Humidity: <span id='data_hum'></span>%</p>
+          <p>Pressure: <span id='data_press'></span> Pa</p>
+          <p>PM 1.0: <span id='data_pm1'></span> &microg/m&sup3;</p>
+          <p>PM 2.5: <span id='data_pm25'></span> &microg/m&sup3;</p>
+          <p>PM 10: <span id='data_pm10'></span> &microg/m&sup3;</p>
+          <p>Last Update: <span id='last_update'></span></p>
+        </div>
 
-    <!-- Tab content -->
-    <div id="Data" class="tabcontent">
-      <h3>Raw Data</h3>
-      <p>Temperature: <span id='data_temp'></span> &#x2103</p>
-      <p>Humidity: <span id='data_hum'></span>%</p>
-      <p>Pressure: <span id='data_press'></span> Pa</p>
-      <p>PM 1.0: <span id='data_pm1'></span> &microg/m&sup3;</p>
-      <p>PM 2.5: <span id='data_pm25'></span> &microg/m&sup3;</p>
-      <p>PM 10: <span id='data_pm10'></span> &microg/m&sup3;</p>
-      <p>Last Update: <span id='last_update'></span></p>
+        <div id="Config" class="tabcontent" data-display="block">
+          <h3>Config</h3>
+          <div id="config_values"></div>
+        </div>
+
+        <div id="CurrentData" class="tabcontent" data-display="grid">
+          <div class="gauge_wrapper">
+            <div id="temp_chart" class="chart"></div>
+            <div id="pressure_chart" class="chart"></div>
+            <div id="humidity_chart" class="chart"></div>
+            <div id="pm1_chart" class="chart"></div>
+            <div id="pm25_chart" class="chart"></div>
+            <div id="pm10_chart" class="chart"></div>
+          </div>
+        </div>
+
+        <div id="TempGraph" class="tabcontent" data-metric="temp" data-display="block">
+          <div class="chart_wrapper">
+            <div id="temp_chart_div" class="histchart"></div>
+          </div>
+          <div class="button_bar">
+                <button class="duration_btn" data-duration="hour">1 Hour</button>
+                <button class="duration_btn" data-duration="day">1 Day</button>
+                <button class="duration_btn" data-duration="month">1 Month</button>
+          </div>
+        </div>
+
+        <div id="HumidityGraph" class="tabcontent" data-metric="hum" data-display="block">
+          <div class="chart_wrapper">
+            <div id='hum_chart_div' class='histchart'></div>
+          </div>
+          <div class="button_bar">
+              <button class="duration_btn" data-duration="hour">1 Hour</button>
+              <button class="duration_btn" data-duration="day">1 Day</button>
+              <button class="duration_btn" data-duration="month">1 Month</button>
+          </div>
+        </div>
+
+        <div id="BmpGraph" class="tabcontent" data-metric="bmp" data-display="block">
+          <div class="chart_wrapper">
+            <div id='bmp_chart_div' class='histchart'></div>
+          </div>
+          <div class="button_bar">
+              <button class="duration_btn" data-duration="hour">1 Hour</button>
+              <button class="duration_btn" data-duration="day">1 Day</button>
+              <button class="duration_btn" data-duration="month">1 Month</button>
+          </div>
+        </div>
+
+        <div id="PMGraph" class="tabcontent" data-metric="pm" data-display="block">
+          <div class="chart_wrapper">
+            <div id='pm_chart_div' class='histchart'></div>
+          </div>
+          <div class="button_bar">
+              <button class="duration_btn" data-duration="hour">1 Hour</button>
+              <button class="duration_btn" data-duration="day">1 Day</button>
+              <button class="duration_btn" data-duration="month">1 Month</button>
+          </div>
+        </div>
     </div>
-
-    <div id="Config" class="tabcontent">
-      <h3>Config</h3>
-      <div id="config_values"></div>
+    <div id="extra_data" class="status_bar">
+      <div id="update_age_box"> Last update: <span id="last_update_age"></div>
     </div>
-
-    <div id="CurrentData" class="tabcontent">
-      <div class="chart_wrapper">
-        <div id="temp_chart" class="chart"></div>
-        <div id="pressure_chart" class="chart"></div>
-        <div id="humidity_chart" class="chart"></div>
-        <div id="pm1_chart" class="chart"></div>
-        <div id="pm25_chart" class="chart"></div>
-        <div id="pm10_chart" class="chart"></div>
-      </div>
-      <div id="extra_data" class="chart">
-        <div id="update_age_box"> Last update: <span id="last_update_age"></div>
-      </div>
-    </div>
-
-    <div id="TempGraph" class="tabcontent" data-metric="temp">
-      <div class="chart_wrapper">
-        <div id='temp_chart_div' class='histchart'></div>
-      </div>
-      <button class="duration_btn" data-duration="hour">1 Hour</button>
-      <button class="duration_btn" data-duration="day">1 Day</button>
-      <button class="duration_btn" data-duration="month">1 Month</button>
-    </div>
-
-    <div id="HumidityGraph" class="tabcontent" data-metric="hum">
-      <div class="chart_wrapper">
-        <div id='hum_chart_div' class='histchart'></div>
-      </div>
-      <button class="duration_btn" data-duration="hour">1 Hour</button>
-      <button class="duration_btn" data-duration="day">1 Day</button>
-      <button class="duration_btn" data-duration="month">1 Month</button>
-    </div>
-
-    <div id="BmpGraph" class="tabcontent" data-metric="bmp">
-      <div class="chart_wrapper">
-        <div id='bmp_chart_div' class='histchart'></div>
-      </div>
-      <button class="duration_btn" data-duration="hour">1 Hour</button>
-      <button class="duration_btn" data-duration="day">1 Day</button>
-      <button class="duration_btn" data-duration="month">1 Month</button>
-    </div>
-
-    <div id="PMGraph" class="tabcontent" data-metric="pm">
-      <div class="chart_wrapper">
-        <div id='pm_chart_div' class='histchart'></div>
-      </div>
-      <button class="duration_btn" data-duration="hour">1 Hour</button>
-      <button class="duration_btn" data-duration="day">1 Day</button>
-      <button class="duration_btn" data-duration="month">1 Month</button>
-    </div>
-
 </div>
 
 <script>
