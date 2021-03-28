@@ -4,3 +4,4 @@ controller/bazel-controller
 controller/bazel-out
 controller/bazel-testlogs
 *.swp
+*.rdb
