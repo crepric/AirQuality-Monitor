@@ -373,7 +373,8 @@ function drawTempTimeline(data, graph) {
   graph.data.addRows(converted_data);
   graph.chart.draw(graph.data, {
       displayAnnotations: true,
-      displayZoomButtons : false
+      displayZoomButtons : false,
+      thickness: 3,
   });
   graph.chart.setVisibleChartRange(null, null);
 }
