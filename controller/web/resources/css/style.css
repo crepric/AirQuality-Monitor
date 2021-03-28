@@ -39,6 +39,19 @@ font-family : Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Ari
   background-color: #ddd;
 }
 
+.button_bar .duration_btn {
+  background-color: #4285F4;
+  color: white;
+  float: left;
+  border: 1px solid #ddd;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 18;
+  height: 100%;
+}
+
 /* Create an active/current tablink class */
 .tab button.active {
   background-color: #ccc;
