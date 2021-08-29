@@ -155,6 +155,10 @@ function getCurrentData() {
       populateData(this.responseText);
     }
   };
+  xhttp.onerror = function() {
+    let update_age_box = document.getElementById("update_age_box");
+    update_age_box.style.backgroundColor = "#000000";
+  };
   xhttp.open("GET", "/current_data", true);
   xhttp.send();
 }
