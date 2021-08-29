@@ -78,7 +78,7 @@ class MockGATTToolBLEDevice:
         self._disconnect_cb = cb
         self._callbacks = {}
 
-    def char_read(self, property_id: str) -> List[int]:
+    def char_read(self, property_id: str):
         if property_id == CONFIG_UUID:
             ret: Config = {
                 'visualization': Views(1),
