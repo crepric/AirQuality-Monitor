@@ -7,16 +7,24 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.WARNING)
 
+# If running in bazel.
 r = runfiles.Create()
-runfiles_dir = r.EnvVars()['RUNFILES_DIR']
-TEMPLATE_FOLDER = 'air_quality_monitor/web/templates/'
-STATIC_FOLDER = 'air_quality_monitor/web/resources/'
+
+# If running as standalone binary, set AQM_FOLDER to the folder containing the
+# web/ resources.
+runfiles_dir = str(os.getenv('AQM_FOLDER'))
+if r is not None:
+    # If running in bazel, grab templates and files from this folder
+    runfiles_dir = os.path.join(
+        r.EnvVars()['RUNFILES_DIR'], 'air_quality_monitor')
+
+TEMPLATE_FOLDER = os.path.join(runfiles_dir, 'web/templates/')
+STATIC_FOLDER = os.path.join(runfiles_dir, 'web/resources/')
 
 flaskbp = Blueprint('aqm',
                     __name__,
-                    template_folder=os.path.join(
-                        runfiles_dir, TEMPLATE_FOLDER),
-                    static_folder=os.path.join(runfiles_dir, STATIC_FOLDER),
+                    template_folder=TEMPLATE_FOLDER,
+                    static_folder=STATIC_FOLDER,
                     static_url_path="")
 
 
@@ -29,22 +37,22 @@ def create_app(aqm_config_manager, aqm_data_manager):
     return app
 
 
-@flaskbp.errorhandler(400)
+@ flaskbp.errorhandler(400)
 def resource_not_found(e):
     return jsonify(error=str(e)), 400
 
 
-@flaskbp.route('/')
+@ flaskbp.route('/')
 def serve():
     return render_template('index.html')
 
 
-@flaskbp.route('/current_config', methods=['GET'])
+@ flaskbp.route('/current_config', methods=['GET'])
 def serve_current_config():
     return jsonify(current_app.config['CM'].remote_config_str)
 
 
-@flaskbp.route('/current_data', methods=['GET'])
+@ flaskbp.route('/current_data', methods=['GET'])
 def serve_current_data():
     return jsonify(
         {
@@ -55,7 +63,7 @@ def serve_current_data():
     )
 
 
-@flaskbp.route('/history', methods=['GET'])
+@ flaskbp.route('/history', methods=['GET'])
 def history():
     metrics = request.args.get('metric', default=None)
     duration = request.args.get('duration', default=None)
@@ -81,7 +89,7 @@ def history():
     )
 
 
-@flaskbp.route('/get_config_options', methods=['GET'])
+@ flaskbp.route('/get_config_options', methods=['GET'])
 def serve_config_values():
     return jsonify(current_app.config['CM'].all_config_values)
 
