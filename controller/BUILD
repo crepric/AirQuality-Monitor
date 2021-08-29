@@ -17,6 +17,25 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//bazel_helpers:ipython.bzl", "ipython")
 load("@mypy_integration//:mypy.bzl", "mypy_test")
 load("@my_deps//:requirements.bzl", "requirement")
+load("@subpar//:subpar.bzl", "par_binary")
+load("@com_github_google_rules_install//installer:def.bzl", "installer")
+
+par_binary(
+    name = "aqm_standalone",
+    main = "aqm_main.py",
+    srcs = ["aqm_main.py"],
+    python_version = "PY3",
+    deps = [
+        ":aqm_controller_lib",
+        ":aqm_config_manager_lib",
+        ":aqm_data_manager_lib",
+        ":webservice_lib",
+        "@com_github_abseil_abseil_py//absl:app",
+        "@com_github_abseil_abseil_py//absl/flags",
+        "@com_github_abseil_abseil_py//absl/logging",
+        "@rules_python//python/runfiles",
+    ],
+)
 
 py_binary(
     name = "aqm_main",
@@ -36,6 +55,11 @@ py_binary(
         "@com_github_abseil_abseil_py//absl/logging",
         "@rules_python//python/runfiles",
     ],
+)
+
+installer(
+  name = "aqm_installer",
+  data = [":aqm_standalone.par"],
 )
 
 filegroup(
@@ -74,6 +98,7 @@ py_library(
     name = "aqm_controller_lib",
     srcs = ["aqm_controller.py"],
     deps = [
+        ":pygatt_simulate",
         requirement("retry"),
         "@com_github_abseil_abseil_py//absl/logging",
         "@crepric_pygatt//pygatt:pygatt_lib",
@@ -87,6 +112,11 @@ py_library(
         "@com_github_abseil_abseil_py//absl/logging",
         requirement("Flask"),
     ]
+)
+
+py_library(
+    name = "pygatt_simulate",
+    srcs = ["pygatt_simulate.py"],
 )
 
 ipython(

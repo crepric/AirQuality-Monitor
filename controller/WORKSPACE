@@ -142,3 +142,23 @@ git_repository(
     remote = "https://github.com/crepric/pygatt.git",
     branch = "master",
 )
+
+git_repository(
+    name = "subpar",
+    remote = "https://github.com/google/subpar",
+    tag = "2.0.0",
+)
+
+git_repository(
+    name = "com_github_google_rules_install",
+    remote = "https://github.com/google/bazel_rules_install",
+    tag = "0.4",
+)
+
+load("@com_github_google_rules_install//:deps.bzl", "install_rules_dependencies")
+
+install_rules_dependencies()
+
+load("@com_github_google_rules_install//:setup.bzl", "install_rules_setup")
+
+install_rules_setup()
