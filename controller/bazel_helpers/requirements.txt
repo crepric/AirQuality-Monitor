@@ -1,2 +1,3 @@
-ipython==7.8.0 \
-  --hash=sha256:c4ab005921641e40a68e405e286e7a1fcc464497e14d81b6914b4fd95e5dee9b
+ipython==7.16.3 \
+  --hash=sha256:c0427ed8bc33ac481faf9d3acf7e84e0010cdaada945e0badd1e2e74cc075833 \
+  --hash=sha256:5ac47dc9af66fc2f5530c12069390877ae372ac905edca75a92a6e363b5d7caa
